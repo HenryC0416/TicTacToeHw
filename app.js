@@ -34,8 +34,14 @@ const winningConditions = [[0, 1, 2], [3, 4, 5], [6, 7, 8],  [0, 3, 6], [1, 4, 7
 function handleCellPlayed(clickedCell, clickedCellIndex) {
   // Update the game state to reflect the move
   // Display the current player's symbol in the clicked cell
-  gameState[clickedCellIndex] = currentPlayer;
-  clickedCell.innerHTML = currentPlayer;
+  if(gameState[clickedCellIndex]==""){
+    gameState[clickedCellIndex] = currentPlayer;
+    clickedCell.innerHTML = currentPlayer;
+  }
+  else{
+    return;
+  }
+    
 }
 
 /**
@@ -109,7 +115,7 @@ function handleCellClick(clickedCellEvent) {
   );
 
   // If the cell is already filled or the game is not active, don't do anything
-  if(gameState[clickedCell]=="" || gameActive == false){
+  if(gameState[clickedCellIndex] !== "" || gameActive == false){
     return;
   }
   // Otherwise, handle the cell being played and validate results
