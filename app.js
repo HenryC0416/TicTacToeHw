@@ -1,7 +1,7 @@
 /**********************************************
  * File: app.js
  * Description: A simple Tic-Tac-Toe game
- * Author: [Your Name]
+ * Author: [Henry Chen]
  **********************************************/
 
 // Select the status display element from the DOM.
@@ -22,7 +22,7 @@ statusDisplay.innerHTML = currentPlayerTurn();
 // Define the possible winning conditions for Tic-Tac-Toe
 // Each array within this array represents a set of indices in 'gameState'
 // that forms a winning line
-const winningConditions = [];
+const winningConditions = [[0, 1, 2], [3, 4, 5], [6, 7, 8],  [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 
 /**
  * handleCellPlayed
@@ -34,6 +34,8 @@ const winningConditions = [];
 function handleCellPlayed(clickedCell, clickedCellIndex) {
   // Update the game state to reflect the move
   // Display the current player's symbol in the clicked cell
+  gameState[clickedCellIndex] = currentPlayer;
+  clickedCell.innerHTML = currentPlayer;
 }
 
 /**
@@ -44,6 +46,8 @@ function handleCellPlayed(clickedCell, clickedCellIndex) {
  */
 function handlePlayerChange() {
   // Toggle the current player
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  statusDisplay.innerHTML = currentPlayerTurn();
   // Update the status text to reflect the new player's turn
 }
 
@@ -58,19 +62,32 @@ function handlePlayerChange() {
 function handleResultValidation() {
   let roundWon = false;
 
-  // Iterate through each winning condition
+ 
+  for(let i=0; i<=7;i++){
+    const winCondition = winningConditions[i];
+    let a = gameState[winCondition[0]];
+    let b = gameState[winCondition[1]];
+    let c = gameState[winCondition[2]];
+    if(a === '' || b === '' || c === ''){
+      continue;
+    }
+    if (a==b && b==c){
+      roundWon = true;    
+    }
+  }
+  if(roundWon){
+    statusDisplay.innerHTML = `${currentPlayer} Won!`;
+    gameActive = false;
+    return;
+  }
 
-  // Destructure the three cell indices that form a potential win
-
-  // If any cell is empty, skip this iteration
-
-  // Check if these three positions match, indicating a win
-
-  // If the round is won, display the winner and end the game
-
-  // If there are no empty cells in 'gameState', it's a draw
-
-  // If the game is neither won nor drawn, switch to the next player
+  let roundDraw = !gameState.includes("");
+  if (roundDraw) {
+    statusDisplay.innerHTML = "Draw!";
+    gameActive = false;
+    return;
+  } 
+  
   handlePlayerChange();
 }
 
@@ -84,6 +101,7 @@ function handleResultValidation() {
  */
 function handleCellClick(clickedCellEvent) {
   // The clicked cell element
+  const clickedCell = clickedCellEvent.target;
 
   // The index of the cell based on its data attribute
   const clickedCellIndex = parseInt(
@@ -91,22 +109,15 @@ function handleCellClick(clickedCellEvent) {
   );
 
   // If the cell is already filled or the game is not active, don't do anything
-
+  if(gameState[clickedCell]=="" || gameActive == false){
+    return;
+  }
   // Otherwise, handle the cell being played and validate results
-
+  handleCellPlayed(clickedCell, clickedCellIndex);
   handleResultValidation();
 }
 
-/**
- * handleRestartGame
- * -----------------
- * Resets the game to its initial state:
- *  - Clears the board
- *  - Resets the 'gameState' array
- *  - Reactivates the game
- *  - Sets the current player to X
- *  - Updates the status display
- */
+
 function handleRestartGame() {
   gameActive = true;
   currentPlayer = "X";
@@ -114,8 +125,14 @@ function handleRestartGame() {
   statusDisplay.innerHTML = currentPlayerTurn();
 
   // Clear each cell in the UI
+  for (let i = 0; i < cells.length; i++) {
+    cells[i].innerHTML = "";
+  }
 }
 
 // Add event listeners to each cell for a click event
+const cells = document.querySelectorAll(".cell");
+cells.forEach((cell) => cell.addEventListener("click", handleCellClick));
 
 // Add event listener to the restart button
+document.querySelector(".game--restart").addEventListener("click", handleRestartGame);
